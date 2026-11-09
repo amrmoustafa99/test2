@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Clinic Booking System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f6f5;--card:#fff;--ink:#12302f;--muted:#5d7776;--line:#d5e2e0;--brand:#0f766e;--brand-ink:#fff;--danger:#b8431a;--soft:#e2f0ee;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1b1a;--card:#152826;--ink:#e6f2f0;--muted:#93b0ad;--line:#27403d;--brand:#35c2b3;--brand-ink:#08201d;--danger:#f0865c;--soft:#1c3633;color-scheme:dark}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Cairo",system-ui,sans-serif;font-size:17px;line-height:1.55}
+header{padding:28px 20px 8px;max-width:980px;margin:auto}
+h1{margin:0;font-size:30px}
+header p{margin:4px 0 0;color:var(--muted)}
+nav{display:flex;gap:8px;flex-wrap:wrap;max-width:980px;margin:16px auto 0;padding:0 20px}
+nav button{font:inherit;font-weight:600;border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 18px;border-radius:999px;cursor:pointer}
+nav button[aria-selected="true"]{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+main{max-width:980px;margin:18px auto 60px;padding:0 20px}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:18px}
+h2{margin:0 0 12px;font-size:21px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;align-items:end}
+label{display:block;font-size:15px;color:var(--muted);margin-bottom:4px}
+input,select{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:3px solid var(--brand);outline-offset:2px}
+.btn{font:inherit;font-weight:600;border:0;background:var(--brand);color:var(--brand-ink);padding:10px 20px;border-radius:10px;cursor:pointer}
+.btn.ghost{background:var(--soft);color:var(--ink)}
+.btn.del{background:transparent;color:var(--danger);border:1px solid var(--danger);padding:5px 12px}
+.wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:560px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-weight:600;font-size:15px}
+.tag{padding:2px 10px;border-radius:999px;font-size:14px;font-weight:600;background:var(--soft)}
+.tag.x{color:var(--danger);background:transparent;border:1px solid var(--danger)}
+.empty{color:var(--muted);padding:12px 0}
+.msg{margin-top:12px;font-weight:600;min-height:1.5em}.msg.err{color:var(--danger)}.msg.ok{color:var(--brand)}
+.tools{display:flex;gap:12px;flex-wrap:wrap;align-items:end;margin-bottom:14px}
+.tools>div{flex:1 1 170px}
+</style>
+</head>
+<body>
+<header><h1>Clinic Booking System</h1><p>Doctors, patients and appointments in one place. Your data is saved in this browser.</p><button class="btn ghost" id="reset" style="margin-top:10px">Reset data</button></header>
+<nav role="tablist" id="nav"></nav>
+<main>
+<section id="doctors">
+ <div class="card"><h2>Add doctor</h2>
+  <div class="row"><div><label for="dn">Name</label><input id="dn"></div><div><label for="dp">Phone</label><input id="dp"></div><div><label for="ds">Specialization</label><input id="ds"></div><button class="btn" id="addD">Add doctor</button></div>
+  <div class="msg" id="dm"></div></div>
+ <div class="card"><h2>Doctors</h2><div class="wrap" id="dl"></div></div>
+</section>
+<section id="patients">
+ <div class="card"><h2>Register patient</h2>
+  <div class="row"><div><label for="pn">Name</label><input id="pn"></div><div><label for="pp">Phone</label><input id="pp"></div><div><label for="pa">Age</label><input id="pa" type="number"></div><button class="btn" id="addP">Register patient</button></div>
+  <div class="msg" id="pm"></div></div>
+ <div class="card"><h2>Patients</h2><div class="wrap" id="pl"></div></div>
+</section>
+<section id="book">
+ <div class="card"><h2>Book appointment</h2>
+  <div class="row"><div><label for="bd">Doctor</label><select id="bd"></select></div><div><label for="bp">Patient</label><select id="bp"></select></div><div><label for="bdate">Date</label><input id="bdate" type="date"></div><div><label for="bt">Time</label><input id="bt" type="time"></div><button class="btn" id="bookB">Book appointment</button></div>
+  <div class="msg" id="bm"></div></div>
+</section>
+<section id="appts">
+ <div class="card"><h2>Appointments</h2>
+  <div class="tools">
+   <div><label for="fp">Search by patient</label><select id="fp"></select></div>
+   <div><label for="fd">Daily schedule</label><input id="fd" type="date"></div>
+   <button class="btn ghost" id="clr">Show all</button>
+   <button class="btn" id="srt">Sort by date and time</button>
+  </div>
+  <div class="msg" id="am"></div>
+  <div class="wrap" id="al"></div></div>
+</section>
+</main>
+<script>
+// Same structure as the C++ code: Person -> Doctor / Patient, Appointment, ClinicSystem
+class Person{constructor(id,name,phone){this.id=id;this.name=name;this.phone=phone}}
+class Doctor extends Person{constructor(id,n,p,spec){super(id,n,p);this.specialization=spec}}
+class Patient extends Person{constructor(id,n,p,age){super(id,n,p);this.age=age}}
+class Appointment{constructor(id,doctorId,patientId,date,time){Object.assign(this,{id,doctorId,patientId,date,time});this.isCancelled=false}cancel(){this.isCancelled=true}}
+
+class ClinicSystem{
+ doctors=[];patients=[];appointments=[];
+ dailySchedule=new Map(); // date -> [appointment ids]
+ nextDoctorId=1;nextPatientId=1;nextAppointmentId=1;
+ findDoctor(id){return this.doctors.find(d=>d.id===id)}
+ findPatient(id){return this.patients.find(p=>p.id===id)}
+ findAppointment(id){return this.appointments.find(a=>a.id===id)}
+ addDoctor(n,p,s){const d=new Doctor(this.nextDoctorId++,n,p,s);this.doctors.push(d);return d}
+ addPatient(n,p,a){const x=new Patient(this.nextPatientId++,n,p,a);this.patients.push(x);return x}
+ book(doctorId,patientId,date,time){
+  if(this.appointments.some(a=>a.doctorId===doctorId&&a.date===date&&a.time===time&&!a.isCancelled))return null;
+  const a=new Appointment(this.nextAppointmentId++,doctorId,patientId,date,time);
+  this.appointments.push(a);
+  if(!this.dailySchedule.has(date))this.dailySchedule.set(date,[]);
+  this.dailySchedule.get(date).push(a.id);return a}
+ sort(){this.appointments.sort((a,b)=>a.date===b.date?a.time.localeCompare(b.time):a.date.localeCompare(b.date))}
+}
+const clinic=new ClinicSystem();
+const KEY="clinic-booking-v1";
+function save(){try{localStorage.setItem(KEY,JSON.stringify({d:clinic.doctors,p:clinic.patients,a:clinic.appointments,n:[clinic.nextDoctorId,clinic.nextPatientId,clinic.nextAppointmentId]}))}catch(e){}}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(!s)return false;
+ s.d.forEach(x=>clinic.doctors.push(new Doctor(x.id,x.name,x.phone,x.specialization)));
+ s.p.forEach(x=>clinic.patients.push(new Patient(x.id,x.name,x.phone,x.age)));
+ s.a.forEach(x=>{const a=new Appointment(x.id,x.doctorId,x.patientId,x.date,x.time);a.isCancelled=x.isCancelled;clinic.appointments.push(a);if(!clinic.dailySchedule.has(a.date))clinic.dailySchedule.set(a.date,[]);clinic.dailySchedule.get(a.date).push(a.id)});
+ [clinic.nextDoctorId,clinic.nextPatientId,clinic.nextAppointmentId]=s.n;return true}catch(e){return false}}
+if(!load()){
+ clinic.addDoctor("Dr. Amira Hassan","0100 111 2233","Cardiology");
+ clinic.addDoctor("Dr. Karim Nabil","0122 444 5566","Pediatrics");
+ clinic.addPatient("Mona Adel","0111 777 8899",29);
+ clinic.addPatient("Omar Samy","0155 321 6540",8);
+}
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const say=(id,t,ok)=>{const e=$(id);e.textContent=t;e.className="msg "+(ok?"ok":"err")};
+const tbl=(heads,rows,empty)=>rows.length?`<table><thead><tr>${heads.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.join("")}</tbody></table>`:`<div class="empty">${empty}</div>`;
+let filter={patient:"",date:""};
+
+const tabs=[["doctors","Doctors"],["patients","Patients"],["book","Book appointment"],["appts","Appointments"]];
+$("nav").innerHTML=tabs.map(([id,l])=>`<button role="tab" data-t="${id}">${l}</button>`).join("");
+function show(id){document.querySelectorAll("section").forEach(s=>s.classList.toggle("on",s.id===id));
+ document.querySelectorAll("nav button").forEach(b=>b.setAttribute("aria-selected",b.dataset.t===id));render()}
+$("nav").onclick=e=>{if(e.target.dataset.t)show(e.target.dataset.t)};
+
+function render(){
+ save();
+ $("dl").innerHTML=tbl(["ID","Name","Phone","Specialization"],clinic.doctors.map(d=>`<tr><td>${d.id}</td><td>${esc(d.name)}</td><td>${esc(d.phone)}</td><td>${esc(d.specialization)}</td></tr>`),"No doctors yet. Add the first one above.");
+ $("pl").innerHTML=tbl(["ID","Name","Phone","Age"],clinic.patients.map(p=>`<tr><td>${p.id}</td><td>${esc(p.name)}</td><td>${esc(p.phone)}</td><td>${p.age}</td></tr>`),"No patients yet. Register the first one above.");
+ const dOpt=clinic.doctors.map(d=>`<option value="${d.id}">${esc(d.name)} (${esc(d.specialization)})</option>`).join("");
+ const pOpt=clinic.patients.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("");
+ const keepD=$("bd").value,keepP=$("bp").value;
+ $("bd").innerHTML=dOpt;$("bp").innerHTML=pOpt;if(keepD)$("bd").value=keepD;if(keepP)$("bp").value=keepP;
+ $("fp").innerHTML=`<option value="">All patients</option>`+pOpt;$("fp").value=filter.patient;$("fd").value=filter.date;
+ let list=clinic.appointments;
+ if(filter.patient)list=list.filter(a=>a.patientId===+filter.patient);
+ if(filter.date){const ids=clinic.dailySchedule.get(filter.date)||[];list=list.filter(a=>ids.includes(a.id))}
+ $("al").innerHTML=tbl(["ID","Doctor","Patient","Date","Time","Status",""],list.map(a=>{
+  const d=clinic.findDoctor(a.doctorId),p=clinic.findPatient(a.patientId);
+  return `<tr><td>${a.id}</td><td>${esc(d.name)}</td><td>${esc(p.name)}</td><td>${a.date}</td><td>${a.time}</td><td><span class="tag ${a.isCancelled?"x":""}">${a.isCancelled?"Cancelled":"Active"}</span></td><td>${a.isCancelled?"":`<button class="btn del" data-c="${a.id}">Cancel</button>`}</td></tr>`}),"No appointments found.");
+}
+
+$("addD").onclick=()=>{const n=$("dn").value.trim(),p=$("dp").value.trim(),s=$("ds").value.trim();
+ if(!n||!p||!s)return say("dm","Fill in name, phone and specialization.");
+ const d=clinic.addDoctor(n,p,s);["dn","dp","ds"].forEach(i=>$(i).value="");say("dm","Doctor added. Doctor ID: "+d.id,1);render()};
+$("addP").onclick=()=>{const n=$("pn").value.trim(),p=$("pp").value.trim(),a=parseInt($("pa").value);
+ if(!n||!p)return say("pm","Fill in name and phone.");
+ if(!(a>0&&a<=120))return say("pm","Enter a valid age between 1 and 120.");
+ const x=clinic.addPatient(n,p,a);["pn","pp","pa"].forEach(i=>$(i).value="");say("pm","Patient registered. Patient ID: "+x.id,1);render()};
+$("bookB").onclick=()=>{
+ if(!clinic.doctors.length||!clinic.patients.length)return say("bm","Add doctors and patients first.");
+ const date=$("bdate").value,time=$("bt").value;
+ if(!date||!time)return say("bm","Choose a date and a time.");
+ const a=clinic.book(+$("bd").value,+$("bp").value,date,time);
+ if(!a)return say("bm","This doctor already has an appointment at this time.");
+ say("bm","Appointment booked. Appointment ID: "+a.id,1);save()};
+$("al").onclick=e=>{const id=e.target.dataset.c;if(!id)return;clinic.findAppointment(+id).cancel();say("am","Appointment cancelled.",1);render()};
+$("fp").onchange=e=>{filter.patient=e.target.value;render()};
+$("fd").onchange=e=>{filter.date=e.target.value;render()};
+$("clr").onclick=()=>{filter={patient:"",date:""};$("am").textContent="";render()};
+$("srt").onclick=()=>{if(!clinic.appointments.length)return say("am","No appointments to sort.");clinic.sort();say("am","Appointments sorted by date and time.",1);render()};
+$("reset").onclick=()=>{if(!confirm("Delete all saved data and restore the sample data?"))return;try{localStorage.removeItem(KEY)}catch(e){}location.reload()};
+show("doctors");
+</script>
+</body>
+</html>
